@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Фотошаринг</title>
+</head>
+<body>
+  <h2>Загрузить фото</h2>
+  <input type="file" id="fileInput" />
+  <button onclick="uploadImage()">Загрузить</button>
+  <p id="linkOutput"></p>
+
+  <script type="module">
+    // 🔻 Вставь сюда свой конфиг Firebase ↓
+    const firebaseConfig = {
+      apiKey: "ТВОЙ_API_KEY",
+      authDomain: "ТВОЙ_ПРОЕКТ.firebaseapp.com",
+      projectId: "ТВОЙ_ПРОЕКТ",
+      storageBucket: "ТВОЙ_ПРОЕКТ.appspot.com",
+      messagingSenderId: "XXXXXX",
+      appId: "1:XXXXXX:web:XXXXXX"
+    };
+
+    // Подключаем Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+    const app = initializeApp(firebaseConfig);
+    const storage = getStorage(app);
+
+    async function uploadImage() {
+      const file = document.getElementById("fileInput").files[0];
+      if (!file) {
+        alert("Выбери файл");
+        return;
+      }
+
+      const storageRef = ref(storage, 'uploads/' + file.name);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+
+      document.getElementById("linkOutput").innerHTML = `
+        <p>Ссылка на фото: <a href="${url}" target="_blank">${url}</a></p>
+        <img src="${url}" style="max-width:300px; margin-top:10px;">
+      `;
+    }
+  </script>
+</body>
+</html>
